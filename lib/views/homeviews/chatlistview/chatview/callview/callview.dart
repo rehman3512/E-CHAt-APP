@@ -175,11 +175,11 @@ class _ChatViewState extends State<ChatView> {
   void _makeVoiceCall() async {
     // Request microphone permission
     if (await Permission.microphone.request().isGranted) {
-      Get.to(() => VoiceCallScreen(
-        peerId: widget.peerId,
-        peerName: widget.peerName,
-        isCaller: true,
-      ));
+      // Get.to(() => VoiceCallScreen(
+      //   peerId: widget.peerId,
+      //   peerName: widget.peerName,
+      //   isCaller: true,
+      // ));
     } else {
       Get.snackbar('Permission Required', 'Microphone permission is needed for voice calls');
     }
@@ -189,11 +189,11 @@ class _ChatViewState extends State<ChatView> {
     // Request camera and microphone permissions
     if (await Permission.camera.request().isGranted &&
         await Permission.microphone.request().isGranted) {
-      Get.to(() => VideoCallScreen(
-        peerId: widget.peerId,
-        peerName: widget.peerName,
-        isCaller: true,
-      ));
+      // Get.to(() => VideoCallScreen(
+      //   peerId: widget.peerId,
+      //   peerName: widget.peerName,
+      //   isCaller: true,
+      // ));
     } else {
       Get.snackbar('Permission Required', 'Camera and microphone permissions are needed for video calls');
     }
@@ -203,7 +203,7 @@ class _ChatViewState extends State<ChatView> {
     try {
       final XFile? image = await _picker.pickImage(source: source);
       if (image != null) {
-        await _chatController.sendImage(File(image.path));
+        // await _chatController.sendImage(File(image.path));
         Get.snackbar('Success', 'Image sent successfully');
       }
     } catch (e) {
@@ -218,8 +218,8 @@ class _ChatViewState extends State<ChatView> {
       );
 
       if (result != null) {
-        File file = File(result.files.single.path!);
-        await _chatController.sendDoc(file);
+        // File file = File(result.files.single.path!);
+        // await _chatController.sendDoc(file);
         Get.snackbar('Success', 'Document sent successfully');
       }
     } catch (e) {

@@ -48,10 +48,14 @@ class ChatView extends StatelessWidget {
                   Text(peerName, style: const TextStyle(fontSize: 16)),
                   Text(peerPhone, style: const TextStyle(fontSize: 12)),
                 ],
-              )
+              ),
             ],
           ),
-        ),
+        ),actions: [
+          IconButton(onPressed: (){}, icon: Icon(Icons.videocam_outlined)),
+          IconButton(onPressed: (){}, icon: Icon(Icons.call_outlined)),
+          IconButton(onPressed: (){}, icon: Icon(Icons.more_vert_outlined))
+      ],
       ),
       body: Column(
         children: [

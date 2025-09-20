@@ -105,6 +105,7 @@
 
 import 'package:chattingapp/data/models/chatmodel.dart';
 import 'package:chattingapp/data/services/presenceservice.dart';
+import 'package:chattingapp/routes/approutes.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -164,73 +165,144 @@ class HomeController extends GetxController {
   void closeSearch() => isSearching.value = false;
 
   // Future<void> addFriendWithName(String phone, String name) async {
-  //   if (uid == null) return;
-  //   final db = FirebaseFirestore.instance;
-  //   final me = uid!;
-  //   final u = await db.collection('users').where('phone', isEqualTo: phone).limit(1).get();
-  //   if (u.docs.isEmpty) return;
-  //   final otherId = u.docs.first.id;
+  //   // 1️⃣ Ensure current user is logged in
+  //   final me = uid;
+  //   if (me == null) {
+  //     print("Current user not logged in");
+  //     Get.snackbar("Error", "Please login first");
+  //     return;
+  //   }
   //
-  //   final chatId = [me, otherId]..sort();
-  //   final id = chatId.join('_');
-  //   final ref = db.collection('chats').doc(id);
-  //   await ref.set({
-  //     'members': [me, otherId],
-  //     'type': 'direct',
-  //     'name': name,
-  //     'updatedAt': FieldValue.serverTimestamp(),
-  //   }, SetOptions(merge: true));
+  //   final db = FirebaseFirestore.instance;
+  //
+  //   try {
+  //     // 2️⃣ Normalize phone number (optional, ensure same format)
+  //     final normalizedPhone = phone.trim();
+  //
+  //     // 3️⃣ Check if the friend already exists
+  //     final userQuery = await db
+  //         .collection('users')
+  //         .where('phone', isEqualTo: normalizedPhone)
+  //         .limit(1)
+  //         .get();
+  //
+  //     String otherId;
+  //
+  //     if (userQuery.docs.isEmpty) {
+  //       // 4️⃣ Create user if not exists
+  //       final newUserRef = db.collection('users').doc();
+  //       await newUserRef.set({
+  //         'id': newUserRef.id,
+  //         'phone': normalizedPhone,
+  //         'name': name,
+  //         'createdAt': FieldValue.serverTimestamp(),
+  //       });
+  //       otherId = newUserRef.id;
+  //       print("New user created with ID: $otherId");
+  //     } else {
+  //       otherId = userQuery.docs.first.id;
+  //       print("Existing user found with ID: $otherId");
+  //     }
+  //
+  //     // 5️⃣ Create unique chatId (sorted)
+  //     final chatId = [me, otherId]..sort();
+  //     final id = chatId.join('_');
+  //     final chatRef = db.collection('chats').doc(id);
+  //
+  //     final existingChat = await chatRef.get();
+  //
+  //     if (existingChat.exists) {
+  //       // 6️⃣ Chat already exists, update timestamp
+  //       await chatRef.update({'updatedAt': FieldValue.serverTimestamp()});
+  //       print("Chat already exists. Timestamp updated.");
+  //     } else {
+  //       // 7️⃣ Create new direct chat
+  //       await chatRef.set({
+  //         'id': id,
+  //         'members': [me, otherId],
+  //         'type': 'direct',
+  //         'name': name,
+  //         'updatedAt': FieldValue.serverTimestamp(),
+  //       });
+  //       print("New chat created with ID: $id");
+  //     }
+  //
+  //     Get.snackbar("Success", "Friend added successfully");
+  //
+  //   } catch (e) {
+  //     print("Failed to add friend: $e");
+  //     Get.snackbar("Error", "Failed to add friend");
+  //   }
   // }
 
   Future<void> addFriendWithName(String phone, String name) async {
-    if (uid == null) return;
-    final db = FirebaseFirestore.instance;
-    final me = uid!;
+    final me = uid;
+    if (me == null || me.isEmpty) {
+      Get.snackbar("Error", "Please login first");
+      return;
+    }
 
+    final db = FirebaseFirestore.instance;
     try {
-      // 🔹 Check or create user first
-      final userQuery = await db.collection('users').where('phone', isEqualTo: phone).limit(1).get();
+      final normalizedPhone = phone.replaceAll(RegExp(r'\s+'), '');
+
+      // Check if user exists
+      final userQuery = await db
+          .collection('users')
+          .where('phone', isEqualTo: normalizedPhone)
+          .limit(1)
+          .get();
 
       String otherId;
       if (userQuery.docs.isEmpty) {
-        // Create temporary user if not found
         final newUserRef = db.collection('users').doc();
         await newUserRef.set({
           'id': newUserRef.id,
-          'phone': phone,
+          'phone': normalizedPhone,
           'name': name,
           'createdAt': FieldValue.serverTimestamp(),
         });
         otherId = newUserRef.id;
+        print("New user created: $otherId");
       } else {
         otherId = userQuery.docs.first.id;
+        print("Existing user: $otherId");
       }
 
-      // 🔹 Generate chatId
+      // Create unique chat
       final chatId = [me, otherId]..sort();
       final id = chatId.join('_');
-      final ref = db.collection('chats').doc(id);
+      final chatRef = db.collection('chats').doc(id);
 
-      final existingChat = await ref.get();
-      if (existingChat.exists) {
-        // just update timestamp to bring it top
-        await ref.update({'updatedAt': FieldValue.serverTimestamp()});
-        return;
+      final existingChat = await chatRef.get();
+
+      if (!existingChat.exists) {
+        await chatRef.set({
+          'id': id,
+          'members': [me, otherId],
+          'type': 'direct',
+          'name': name,
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+        print("Chat created: $id");
+      } else {
+        await chatRef.update({'updatedAt': FieldValue.serverTimestamp()});
+        print("Chat updated: $id");
       }
 
-      // 🔹 Create chat document
-      await ref.set({
-        'id': id,
-        'members': [me, otherId],
-        'type': 'direct',
-        'name': name,
-        'updatedAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
+      chatsList.refresh();
+
+      if (Get.isSnackbarOpen) Get.closeAllSnackbars();
+      Get.snackbar("Success", "$name added successfully");
+
+      if (Get.isBottomSheetOpen == true) Get.back();
 
     } catch (e) {
       print("Failed to add friend: $e");
+      Get.snackbar("Error", "Failed to add friend");
     }
   }
+
 
 
   void toggleDarkMode() => isDarkMode.value = !isDarkMode.value;
@@ -260,4 +332,16 @@ class HomeController extends GetxController {
       'createdBy': me,
     });
   }
+
+
+  void logout() async {
+    try {
+      await FirebaseAuth.instance.signOut(); // Firebase logout
+      Get.offAndToNamed(AppRoutes.Login ); // Navigate to LoginScreen and remove previous routes
+    } catch (e) {
+      print("Error logging out: $e");
+      Get.snackbar("Error", "Failed to logout"); // Optional: show error message
+    }
+  }
+
 }

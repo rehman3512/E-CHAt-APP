@@ -3,39 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'constants/appcolors/appcolors.dart';
 import 'controller/authcontroller.dart';
 import 'controller/chatlistcontroller.dart';
 import 'controller/homecontroller.dart';
 import 'firebase_options.dart';
 
-// Future<void> main() async {
-//   WidgetsFlutterBinding.ensureInitialized();
-//
-//   // 🔹 Init Firebase
-//   await Firebase.initializeApp(
-//     options: DefaultFirebaseOptions.currentPlatform,
-//   );
-//
-//   // 🔹 Init Local Storage
-//   await GetStorage.init();
-//
-//   runApp(const MyApp());
-// }
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 🔹 Init Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // 🔹 Init Local Storage
   await GetStorage.init();
 
-  // ✅ Init Controllers (Permanent so they are not disposed)
   Get.put(AuthController(), permanent: true);
   Get.put(HomeController(), permanent: true);
   Get.put(ChatListController(), permanent: true);

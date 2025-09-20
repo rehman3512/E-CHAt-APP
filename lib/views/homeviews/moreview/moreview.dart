@@ -105,7 +105,7 @@ class MoreView extends StatelessWidget {
               title: "Logout",
               titleColor: Colors.red,
               iconColor: Colors.red,
-              //onTap: () => controller.logout?.call(),
+              onTap: () => controller.logout?.call(),
             ),
           ],
         )),

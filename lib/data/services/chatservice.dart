@@ -20,25 +20,25 @@ class ChatService {
         .map((s) => s.docs.map((e) => MessageModel.fromDoc(e)).toList());
   }
 
-  Future<void> sendText(String chatId, String text) async {
-    if (text.trim().isEmpty) return;
-    final uid = _auth.currentUser!.uid;
-    final ref = _db.collection('chats').doc(chatId);
-    final msgRef = ref.collection('messages').doc();
-
-    await msgRef.set({
-      'senderId': uid,
-      'text': text.trim(),
-      'type': 'text',
-      'status': 'sent',
-      'createdAt': FieldValue.serverTimestamp(),
-    });
-
-    await ref.update({
-      'lastMessage': text.trim(),
-      'updatedAt': FieldValue.serverTimestamp(),
-    });
-  }
+  // Future<void> sendText(String chatId, String text) async {
+  //   if (text.trim().isEmpty) return;
+  //   final uid = _auth.currentUser!.uid;
+  //   final ref = _db.collection('chats').doc(chatId);
+  //   final msgRef = ref.collection('messages').doc();
+  //
+  //   await msgRef.set({
+  //     'senderId': uid,
+  //     'text': text.trim(),
+  //     'type': 'text',
+  //     'status': 'sent',
+  //     'createdAt': FieldValue.serverTimestamp(),
+  //   });
+  //
+  //   await ref.update({
+  //     'lastMessage': text.trim(),
+  //     'updatedAt': FieldValue.serverTimestamp(),
+  //   });
+  // }
 
   Future<String> _upload(String path, File f) async {
     final id = DateTime.now().millisecondsSinceEpoch.toString();
@@ -78,4 +78,64 @@ class ChatService {
       'updatedAt': FieldValue.serverTimestamp(),
     });
   }
+
+
+  Future<void> sendText(String chatId, String text) async {
+    if (text.trim().isEmpty) return;
+    final uid = _auth.currentUser!.uid;
+    final ref = _db.collection('chats').doc(chatId);
+    final msgRef = ref.collection('messages').doc();
+
+    await msgRef.set({
+      'senderId': uid,
+      'text': text.trim(),
+      'type': 'text',
+      'status': 'sent', // initial status
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+
+    await ref.update({
+      'lastMessage': text.trim(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+
+    // Automatically mark as delivered for other users
+    _markDelivered(chatId, msgRef.id);
+  }
+
+  Future<void> _markDelivered(String chatId, String msgId) async {
+    final uid = _auth.currentUser!.uid;
+
+    // update 'delivered' status for all other members
+    final chatDoc = await _db.collection('chats').doc(chatId).get();
+    final members = List<String>.from(chatDoc.data()?['members'] ?? []);
+
+    for (var memberId in members) {
+      if (memberId != uid) {
+        await _db
+            .collection('chats')
+            .doc(chatId)
+            .collection('messages')
+            .doc(msgId)
+            .update({'status': 'delivered'});
+      }
+    }
+  }
+
+  Future<void> markRead(String chatId) async {
+    final uid = _auth.currentUser!.uid;
+    final msgs = await _db
+        .collection('chats')
+        .doc(chatId)
+        .collection('messages')
+        .where('senderId', isNotEqualTo: uid)
+        .where('status', isEqualTo: 'delivered')
+        .get();
+
+    for (var doc in msgs.docs) {
+      await doc.reference.update({'status': 'read'});
+    }
+  }
+
+
 }

@@ -1,7 +1,7 @@
+import 'package:chattingapp/constants/appassets/appAssets.dart';
 import 'package:chattingapp/controller/profilecontroller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import 'profileeditview/profileeditview.dart';
 
 class ProfileView extends StatelessWidget {
@@ -27,7 +27,7 @@ class ProfileView extends StatelessWidget {
               radius: 60,
               backgroundImage: controller.profileImageUrl.value.isNotEmpty
                   ? NetworkImage(controller.profileImageUrl.value)
-                  : AssetImage("assets/user.png") as ImageProvider,
+                  : AssetImage(/*"assets/user.png"*/ AppAssets.defaultAvatar) as ImageProvider,
             ),
             SizedBox(height: 20),
             Text(controller.name.value,

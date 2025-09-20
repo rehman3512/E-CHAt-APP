@@ -182,11 +182,11 @@ class ChatInfoScreen extends StatelessWidget {
                           .snapshots(),
                       builder: (context, snapshot) {
                         if (!snapshot.hasData) {
-                          return const Center(child: CircularProgressIndicator());
+                          return Center(child: Text("No data found"));
                         }
                         final docs = snapshot.data!.docs;
                         if (docs.isEmpty) {
-                          return const Center(child: Text("No media found"));
+                          return Center(child: Text("No media found"));
                         }
                         return ListView.builder(
                           scrollDirection: Axis.horizontal,

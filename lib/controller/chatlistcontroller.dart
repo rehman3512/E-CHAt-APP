@@ -245,4 +245,5 @@ class ChatListController extends GetxController {
       print("Error muting chat: $e");
     }
   }
+
 }
