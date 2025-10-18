@@ -55,13 +55,6 @@
 //                     itemBuilder: (_, i) {
 //                       final data = docs[i].data() as Map<String, dynamic>;
 //                       if (data["type"] == "image") {
-//                         return Padding(
-//                           padding: const EdgeInsets.all(4),
-//                           child: Image.network(data["url"], width: 100, fit: BoxFit.cover),
-//                         );
-//                       } else {
-//                         return Padding(
-//                           padding: const EdgeInsets.all(8),
 //                           child: Column(
 //                             children: [
 //                               const Icon(Icons.insert_drive_file, size: 40),
