@@ -107,11 +107,11 @@ class ChatInfoScreen extends StatelessWidget {
     final currentUser = FirebaseAuth.instance.currentUser;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Chat Info"),
-        backgroundColor: Colors.teal,
-        foregroundColor: Colors.white,
-      ),
+      // appBar: AppBar(
+      //   title: const Text("Chat Info"),
+      //   backgroundColor: Colors.teal,
+      //   foregroundColor: Colors.white,
+      // ),
       body: SingleChildScrollView(
         child: Column(
           children: [
