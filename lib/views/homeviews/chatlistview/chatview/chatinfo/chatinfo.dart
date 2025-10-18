@@ -39,26 +39,6 @@
 //             SizedBox(
 //               height: 120,
 //               child: StreamBuilder<QuerySnapshot>(
-//                 stream: FirebaseFirestore.instance
-//                     .collection("chats")
-//                     .doc(chatId)
-//                     .collection("messages")
-//                     .where("type", whereIn: ["image", "doc"])
-//                               const Icon(Icons.insert_drive_file, size: 40),
-//                         );
-//                       }
-//                     },
-//                 },
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
