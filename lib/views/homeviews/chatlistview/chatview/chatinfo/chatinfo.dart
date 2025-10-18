@@ -44,29 +44,11 @@
 //                     .doc(chatId)
 //                     .collection("messages")
 //                     .where("type", whereIn: ["image", "doc"])
-//                     .snapshots(),
-//                 builder: (context, snapshot) {
-//                   if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
-//                   final docs = snapshot.data!.docs;
-//                   if (docs.isEmpty) return const Center(child: Text("No Media Found"));
-//                   return ListView.builder(
-//                     scrollDirection: Axis.horizontal,
-//                     itemCount: docs.length,
-//                     itemBuilder: (_, i) {
-//                       final data = docs[i].data() as Map<String, dynamic>;
-//                       if (data["type"] == "image") {
-//                           child: Column(
-//                             children: [
 //                               const Icon(Icons.insert_drive_file, size: 40),
-//                               Text(data["fileName"] ?? "Doc"),
-//                             ],
-//                           ),
 //                         );
 //                       }
 //                     },
-//                   );
 //                 },
-//               ),
 //             ),
 //           ],
 //         ),
